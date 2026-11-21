@@ -183,10 +183,18 @@ function App() {
         {detailView ? <>
           {activePlace ? <>
             <div className="eyebrow">{activePlace.type || "ПОСЕЛЕНИЕ"}</div>
-            {activePlace.name === "Каменный Брод" && activePlace.kind === "city" && (
+            {activePlace.kind === "city" && ({
+              "Каменный Брод": "/maps/stone-bridge-town.png",
+              "Гранитный Венец": "/maps/granite-crown.png",
+              "Ауренхельм": "/maps/aurenhelm.png"
+            })[activePlace.name] && (
               <img
-                src="/maps/stone-bridge-town.png"
-                alt="Панорама города Каменный Брод"
+                src={({
+                  "Каменный Брод": "/maps/stone-bridge-town.png",
+                  "Гранитный Венец": "/maps/granite-crown.png",
+                  "Ауренхельм": "/maps/aurenhelm.png"
+                })[activePlace.name]}
+                alt={`Панорама города ${activePlace.name}`}
                 className="place-illustration"
                 style={{
                   display: "block",

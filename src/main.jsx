@@ -6,9 +6,15 @@ import "leaflet/dist/leaflet.css";
 import "./style.css";
 
 const WORLD_W = 1448, WORLD_H = 1086;
-const REGION_W = 1536, REGION_H = 1024;
+const REGION_W = 1671, REGION_H = 941;
 const worldBounds = [[0, 0], [WORLD_H, WORLD_W]];
 const regionBounds = [[0, 0], [REGION_H, REGION_W]];
+// Координаты поселений хранятся в исходной сетке 1536×1024.
+// Преобразуем их к размеру обновлённого изображения региональной карты.
+const regionPosition = (x, y) => [
+  REGION_H - y * (REGION_H / 1024),
+  x * (REGION_W / 1536)
+];
 
 // Граница Теократии на мировой карте. Координаты привязаны к исходному изображению.
 const borderPixels = [
@@ -165,9 +171,9 @@ function App() {
             <ZoomToCountry selected={selected} />
           </MapContainer> : <MapContainer key="detailed-region" crs={L.CRS.Simple} bounds={regionBounds} minZoom={-1} maxZoom={2.5} zoomSnap={0.25} scrollWheelZoom={true} zoomControl={true} maxBounds={[[-60,-60],[REGION_H+60,REGION_W+60]]}>
             <ImageOverlay url="/maps/theocracy-region.png" bounds={regionBounds} />
-            {cities.map(city=><Marker key={city.name} position={[REGION_H-city.y,city.x]} icon={cityIcon} eventHandlers={{mouseover:()=>setActivePlace({ ...city, kind:"city" })}} />)}
-            {villages.map(([name,x,y])=><Marker key={name} position={[REGION_H-y,x]} icon={villageIcon} eventHandlers={{mouseover:()=>setActivePlace({name,type:"Деревня",kind:"village",desc:`Небольшое сельское поселение Теократии. Жители занимаются хозяйством, ремеслом и снабжают ближайший город.`})}} />)}
-            {forts.map(f=><Marker key={f.name} position={[REGION_H-f.y,f.x]} icon={fortIcon} eventHandlers={{mouseover:()=>setActivePlace({...f,type:"Пограничная крепость",kind:"fort"})}} />)}
+            {cities.map(city=><Marker key={city.name} position={regionPosition(city.x,city.y)} icon={cityIcon} eventHandlers={{mouseover:()=>setActivePlace({ ...city, kind:"city" })}} />)}
+            {villages.map(([name,x,y])=><Marker key={name} position={regionPosition(x,y)} icon={villageIcon} eventHandlers={{mouseover:()=>setActivePlace({name,type:"Деревня",kind:"village",desc:`Небольшое сельское поселение Теократии. Жители занимаются хозяйством, ремеслом и снабжают ближайший город.`})}} />)}
+            {forts.map(f=><Marker key={f.name} position={regionPosition(f.x,f.y)} icon={fortIcon} eventHandlers={{mouseover:()=>setActivePlace({...f,type:"Пограничная крепость",kind:"fort"})}} />)}
           </MapContainer>}
           <div className="map-hint">{detailView ? "Подробная карта · Наведите курсор на город, деревню или крепость, чтобы увидеть сведения" : regionView ? "Обзор региона · Здесь сохранён исходный рельеф мировой карты" : selected ? "Двойное нажатие открывает региональный уровень" : "Наведите на Теократию и нажмите, чтобы открыть государство · Двойное нажатие — карта региона"}</div>
         </div>

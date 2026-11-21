@@ -119,6 +119,14 @@ function App() {
     setDetailView(false);
     setActivePlace(null);
   };
+  // Двойное нажатие на страну сразу открывает подробную территориальную карту,
+  // минуя промежуточную карточку второго уровня.
+  const openDetailedRegion = () => {
+    setSelected(true);
+    setRegionView(true);
+    setDetailView(true);
+    setActivePlace(null);
+  };
   const backToWorld = () => {
     setSelected(false);
     setRegionView(false);
@@ -150,7 +158,7 @@ function App() {
               mouseover:e=>e.target.setStyle({fillOpacity:0.30}),
               mouseout:e=>e.target.setStyle(normalStyle),
               click:showCountry,
-              dblclick:e=>{L.DomEvent.stopPropagation(e);openRegion();}
+              dblclick:e=>{L.DomEvent.stopPropagation(e);openDetailedRegion();}
             }}>
               <Tooltip sticky direction="top" opacity={1}>Теократия Красной Розы · Нажмите, чтобы открыть</Tooltip>
             </Polygon>

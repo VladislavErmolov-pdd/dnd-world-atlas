@@ -184,6 +184,22 @@ function App() {
           <div className="region-banner"><span className="eyebrow">ПОДРОБНЫЙ АТЛАС</span><strong>Теократия Красной Розы</strong><p>Карта местности с городами, деревнями, пограничными крепостями и дорогами. Главный тракт вымощен серым камнем; региональные дороги и местные пути показаны более тёплыми земляными оттенками.</p></div>
           {activePlace ? <>
             <div className="eyebrow">{activePlace.type || "ПОСЕЛЕНИЕ"}</div>
+            {activePlace.name === "Каменный Брод" && activePlace.kind === "city" && (
+              <img
+                src="/maps/stone-bridge-town.png"
+                alt="Панорама города Каменный Брод"
+                className="place-illustration"
+                style={{
+                  display: "block",
+                  width: "100%",
+                  aspectRatio: "16 / 9",
+                  objectFit: "cover",
+                  borderRadius: "12px",
+                  margin: "14px 0",
+                  border: "1px solid rgba(180, 145, 86, 0.45)"
+                }}
+              />
+            )}
             {activePlace.days && <p className="official">Путь от столицы: {activePlace.days}</p>}
             <p><strong>{activePlace.name}</strong> — {activePlace.desc}</p>
             <button className="back-button" onClick={()=>setActivePlace(null)}>← К обзору местности</button>

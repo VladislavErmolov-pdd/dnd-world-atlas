@@ -181,7 +181,6 @@ function App() {
 
       <aside className="side-panel">
         {detailView ? <>
-          <div className="region-banner"><span className="eyebrow">ПОДРОБНЫЙ АТЛАС</span><strong>Теократия Красной Розы</strong><p>Карта местности с городами, деревнями, пограничными крепостями и дорогами. Главный тракт вымощен серым камнем; региональные дороги и местные пути показаны более тёплыми земляными оттенками.</p></div>
           {activePlace ? <>
             <div className="eyebrow">{activePlace.type || "ПОСЕЛЕНИЕ"}</div>
             {activePlace.name === "Каменный Брод" && activePlace.kind === "city" && (
@@ -204,6 +203,7 @@ function App() {
             <p><strong>{activePlace.name}</strong> — {activePlace.desc}</p>
             <button className="back-button" onClick={()=>setActivePlace(null)}>← К обзору местности</button>
           </> : <>
+            <div className="region-banner"><span className="eyebrow">ПОДРОБНЫЙ АТЛАС</span><strong>Теократия Красной Розы</strong><p>Карта местности с городами, деревнями, пограничными крепостями и дорогами. Главный тракт вымощен серым камнем; региональные дороги и местные пути показаны более тёплыми земляными оттенками.</p></div>
             <div className="crest">☼</div>
             <div className="eyebrow">РЕГИОНАЛЬНЫЙ АТЛАС</div>
             <h2>Теократия Святого Восхода</h2>

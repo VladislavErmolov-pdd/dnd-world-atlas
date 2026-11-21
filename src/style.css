@@ -9,3 +9,20 @@
 /* Убираем браузерную рамку фокуса вокруг SVG-границы Leaflet */
 .leaflet-container path.leaflet-interactive:focus { outline: none !important; }
 .leaflet-container .leaflet-interactive { -webkit-tap-highlight-color: transparent; }
+
+/* Интерактивная территория: без внешней обводки, только мягкое свечение внутри. */
+.leaflet-overlay-pane path.territory-hit-area {
+  stroke: none !important;
+  fill: #e9bd69;
+  fill-opacity: 0.001;
+  transition: fill-opacity 220ms ease, filter 220ms ease;
+  outline: none !important;
+}
+.leaflet-overlay-pane path.territory-hit-area:hover {
+  fill-opacity: 0.30 !important;
+  filter: drop-shadow(0 0 9px rgba(241, 190, 101, 0.62))
+          drop-shadow(0 0 20px rgba(241, 190, 101, 0.28));
+}
+.leaflet-overlay-pane path.territory-hit-area:focus {
+  outline: none !important;
+}

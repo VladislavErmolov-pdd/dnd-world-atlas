@@ -127,11 +127,11 @@ function App() {
   });
 
   const normalStyle = {
-    color: "#d9b36d",
-    weight: 1.1,
-    opacity: 0.28,
-    fillColor: "#e4b65b",
-    fillOpacity: 0
+    stroke: false,
+    fill: true,
+    fillColor: "#e9bd69",
+    fillOpacity: 0.001,
+    className: "territory-hit-area"
   };
 
   return <div className="app-shell">
@@ -154,7 +154,7 @@ function App() {
               positions={borderPositions}
               pathOptions={normalStyle}
               eventHandlers={{
-                mouseover: e => e.target.setStyle({color:"#ffe09a",weight:3.5,opacity:1,fillColor:"#f0c46d",fillOpacity:0.13}),
+                mouseover: e => e.target.setStyle({ fillOpacity: 0.30 }),
                 mouseout: e => e.target.setStyle(normalStyle),
                 click: () => setSelected(true)
               }}

@@ -186,13 +186,21 @@ function App() {
             {activePlace.kind === "city" && ({
               "Каменный Брод": "/maps/stone-bridge-town.png",
               "Гранитный Венец": "/maps/granite-crown.png",
-              "Ауренхельм": "/maps/aurenhelm.png"
+              "Ауренхельм": "/maps/aurenhelm.png",
+              "Светозар": "/maps/svetozar.png",
+              "Тихоречье": "/maps/tikhorechye.png",
+              "Златодол": "/maps/zlatodol.png",
+              "Розенвальд": "/maps/rozenvald.png"
             })[activePlace.name] && (
               <img
                 src={({
                   "Каменный Брод": "/maps/stone-bridge-town.png",
                   "Гранитный Венец": "/maps/granite-crown.png",
-                  "Ауренхельм": "/maps/aurenhelm.png"
+                  "Ауренхельм": "/maps/aurenhelm.png",
+              "Светозар": "/maps/svetozar.png",
+              "Тихоречье": "/maps/tikhorechye.png",
+              "Златодол": "/maps/zlatodol.png",
+              "Розенвальд": "/maps/rozenvald.png"
                 })[activePlace.name]}
                 alt={`Панорама города ${activePlace.name}`}
                 className="place-illustration"

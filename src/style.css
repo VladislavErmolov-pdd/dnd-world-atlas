@@ -48,13 +48,23 @@
 }
 
 
-/* Невидимые области наведения располагаются поверх нарисованных на карте объектов. */
-.atlas-hotspot-wrap { background:transparent !important; border:0 !important; outline:none !important; }
-.atlas-hotspot { display:block; width:100%; height:100%; background:transparent; border:0; cursor:default; }
-.atlas-hotspot-wrap:focus,
-.atlas-hotspot:focus,
-.atlas-hotspot:focus-visible { outline:none !important; box-shadow:none !important; }
-
+/* Маркеры подробной карты */
+.atlas-marker-wrap { background: transparent; border: 0; }
+.atlas-city-marker {
+  display:grid; place-items:center; width:28px; height:28px; border-radius:50%;
+  color:#ffe6ad; background:#39231f; border:2px solid #e6bd75;
+  box-shadow:0 0 10px #000b, 0 0 12px #d5a75b88; font-size:17px;
+}
+.atlas-fort-marker {
+  display:grid; place-items:center; width:25px; height:25px; border-radius:5px;
+  color:#f1e4c9; background:#30383a; border:2px solid #b7b4a8;
+  box-shadow:0 0 9px #000c; font-size:16px;
+}
+.atlas-village-marker {
+  display:grid; place-items:center; width:12px; height:12px; border-radius:50%;
+  color:#f5e4c5; background:#765d3b; border:1px solid #ead3a4;
+  box-shadow:0 0 5px #000d; font-size:8px;
+}
 .place-list { margin:14px 0; border-top:1px solid #51432f; }
 .place-row {
   width:100%; display:flex; align-items:center; gap:10px; padding:9px 5px;
@@ -66,3 +76,166 @@
 .back-button.wide { width:100%; margin-top:10px; }
 .leaflet-tooltip { white-space:nowrap; }
 
+/* === Обновлённое оформление: эпический фэнтези-атлас === */
+:root {
+  color-scheme: dark;
+  --atlas-ink: #091116;
+  --atlas-deep: #101b20;
+  --atlas-panel: rgba(18, 29, 33, .94);
+  --atlas-gold: #c9a15d;
+  --atlas-gold-bright: #e5c27d;
+  --atlas-text: #e9e1d1;
+}
+
+html { min-height: 100%; background: var(--atlas-ink); }
+body {
+  min-height: 100vh;
+  color: var(--atlas-text);
+  background-color: #0b1419;
+  background-image:
+    radial-gradient(ellipse at 50% 0%, rgba(54, 73, 69, .28), transparent 52%),
+    radial-gradient(ellipse at 5% 45%, rgba(102, 73, 39, .13), transparent 42%),
+    radial-gradient(ellipse at 95% 75%, rgba(76, 55, 34, .12), transparent 40%),
+    repeating-linear-gradient(0deg, rgba(205, 174, 117, .018) 0px, rgba(205, 174, 117, .018) 1px, transparent 1px, transparent 5px),
+    repeating-linear-gradient(90deg, rgba(205, 174, 117, .012) 0px, rgba(205, 174, 117, .012) 1px, transparent 1px, transparent 7px),
+    linear-gradient(135deg, #142329 0%, #0a1217 48%, #11191b 100%);
+  background-attachment: fixed;
+}
+
+.app-shell {
+  width: min(100%, 1840px);
+  max-width: 1840px;
+  margin: 0 auto;
+  padding: 0 clamp(16px, 3.2vw, 52px);
+}
+.topbar {
+  min-height: 96px;
+  height: auto;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(201, 161, 93, .58);
+  box-shadow: 0 1px 0 rgba(0,0,0,.45);
+}
+.brand-mark {
+  width: 50px;
+  height: 50px;
+  border-color: rgba(229, 194, 125, .8);
+  background: radial-gradient(circle, rgba(201,161,93,.14), rgba(11,18,22,.6));
+  box-shadow: 0 0 22px rgba(201,161,93,.12), inset 0 0 12px rgba(201,161,93,.08);
+}
+.topbar h1 { letter-spacing: .35px; }
+.top-actions { letter-spacing: .35px; }
+
+/* Карта занимает около 75% доступной ширины; координаты Leaflet не меняются. */
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(300px, 1fr);
+  gap: clamp(18px, 2vw, 30px);
+  padding: clamp(20px, 2.4vw, 34px) 0;
+  align-items: stretch;
+}
+.map-section { min-width: 0; }
+.map-heading { margin-bottom: 15px; }
+.map-heading h2, .side-panel h2 {
+  color: #f3e4c5;
+  text-shadow: 0 2px 12px rgba(0,0,0,.55);
+}
+.map-frame {
+  height: min(78vh, 920px);
+  min-height: 560px;
+  border: 1px solid rgba(201,161,93,.76);
+  border-radius: 12px;
+  background: #0b151a;
+  box-shadow:
+    0 22px 65px rgba(0,0,0,.48),
+    0 0 0 1px rgba(229,194,125,.08),
+    inset 0 0 28px rgba(0,0,0,.4);
+}
+.leaflet-container {
+  background: #0c171c;
+}
+.leaflet-control-zoom {
+  border: 1px solid rgba(201,161,93,.6) !important;
+  box-shadow: 0 4px 14px rgba(0,0,0,.35) !important;
+}
+.leaflet-control-zoom a {
+  background: rgba(17,31,36,.96) !important;
+  color: #f0d8a9 !important;
+  border-color: rgba(201,161,93,.4) !important;
+}
+.leaflet-control-zoom a:hover { background: #34413d !important; }
+.leaflet-tooltip {
+  background: rgba(20,30,32,.97);
+  color: #f4e5c8;
+  border: 1px solid rgba(218,177,105,.82);
+  box-shadow: 0 5px 18px rgba(0,0,0,.45);
+}
+.map-hint {
+  max-width: calc(100% - 32px);
+  padding: 9px 16px;
+  color: #f0d9ae;
+  background: rgba(9,17,21,.92);
+  border: 1px solid rgba(201,161,93,.7);
+  box-shadow: 0 5px 20px rgba(0,0,0,.35);
+  backdrop-filter: blur(6px);
+}
+
+.side-panel {
+  min-width: 0;
+  max-height: calc(min(78vh, 920px) + 65px);
+  padding: clamp(18px, 1.8vw, 28px);
+  border: 1px solid rgba(201,161,93,.7);
+  border-radius: 12px;
+  background:
+    radial-gradient(ellipse at 100% 0%, rgba(124,91,49,.13), transparent 55%),
+    linear-gradient(155deg, rgba(28,43,44,.97), rgba(12,21,26,.97));
+  box-shadow: 0 18px 48px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,228,176,.045);
+}
+.side-panel h2 { font-size: clamp(21px, 1.55vw, 27px); }
+.side-panel p { color: #d0c6b2; }
+.region-banner {
+  border-color: rgba(213,174,105,.55);
+  background: linear-gradient(135deg, rgba(201,161,93,.12), rgba(14,25,29,.55));
+  box-shadow: inset 0 1px 0 rgba(255,230,180,.05);
+}
+.region-banner strong { color: #f2d8a4; }
+.notice, .city-note {
+  background: rgba(7,15,19,.55);
+  border: 1px solid rgba(174,137,79,.28);
+}
+.country:hover, .country.active {
+  background: linear-gradient(90deg, rgba(120,83,42,.55), rgba(75,54,34,.48));
+}
+.back-button, .city-card {
+  transition: background .18s ease, border-color .18s ease, transform .18s ease;
+}
+.back-button:hover, .city-card:hover {
+  background: #463624;
+  border-color: #e0b66d;
+}
+.back-button:active, .city-card:active { transform: translateY(1px); }
+.place-illustration {
+  box-shadow: 0 9px 28px rgba(0,0,0,.42);
+}
+footer {
+  border-top-color: rgba(201,161,93,.45);
+  color: #b09a72;
+}
+
+@media (min-width: 1500px) {
+  .map-frame { height: min(80vh, 980px); }
+}
+@media (max-width: 1050px) {
+  .layout { grid-template-columns: minmax(0, 1fr) minmax(280px, .42fr); }
+  .map-frame { min-height: 500px; }
+}
+@media (max-width: 820px) {
+  .app-shell { padding: 0 14px; }
+  .layout { grid-template-columns: 1fr; gap: 16px; }
+  .map-frame { height: 65vh; min-height: 420px; }
+  .side-panel { max-height: none; }
+  .topbar { min-height: 78px; }
+}
+@media (max-width: 480px) {
+  .map-frame { height: 58vh; min-height: 360px; }
+  .map-heading h2 { font-size: 18px; }
+}

@@ -102,21 +102,27 @@ const borderPositions = borderPixels.map(([x,y]) => [H-y, x]);
 // При необходимости можно будет сдвинуть её на несколько пикселей после проверки.
 const capitalPosition = [H-415, 696];
 
-function ZoomToRegion({ active }) {
+function ZoomToRegion({ active, regionView }) {
   const map = useMap();
   React.useEffect(() => {
-    if (active) {
+    if (regionView) {
+      // Второй уровень: тот же фрагмент исходной мировой карты,
+      // увеличенный до границ Теократии — рельеф остаётся идентичным.
       const regionBounds = [[H-625, 500], [H-280, 970]];
-      map.flyToBounds(regionBounds, { duration: 1.25, padding: [28, 28] });
+      map.flyToBounds(regionBounds, { duration: 1.25, padding: [18, 18] });
+    } else if (active) {
+      const regionBounds = [[H-625, 500], [H-280, 970]];
+      map.flyToBounds(regionBounds, { duration: 1.1, padding: [28, 28] });
     } else {
       map.flyToBounds(imageBounds, { duration: 1.1, padding: [8, 8] });
     }
-  }, [active, map]);
+  }, [active, regionView, map]);
   return null;
 }
 
 function App() {
   const [selected, setSelected] = useState(false);
+  const [regionView, setRegionView] = useState(false);
   const [showCity, setShowCity] = useState(false);
 
   const cityIcon = L.divIcon({
@@ -144,8 +150,8 @@ function App() {
     <main className="layout">
       <section className="map-section">
         <div className="map-heading">
-          <div><div className="eyebrow">{selected ? "ТЕРРИТОРИЯ ГОСУДАРСТВА" : "МИРОВАЯ КАРТА"}</div><h2>{selected ? "Теократия Красной Розы" : "Известные земли"}</h2></div>
-          {selected && <button className="back-button" onClick={() => {setSelected(false); setShowCity(false);}}>← Ко всему миру</button>}
+          <div><div className="eyebrow">{regionView ? "РЕГИОНАЛЬНАЯ КАРТА" : selected ? "ТЕРРИТОРИЯ ГОСУДАРСТВА" : "МИРОВАЯ КАРТА"}</div><h2>{regionView ? "Теократия Красной Розы · земли и поселения" : selected ? "Теократия Красной Розы" : "Известные земли"}</h2></div>
+          {(selected || regionView) && <button className="back-button" onClick={() => {setSelected(false); setRegionView(false); setShowCity(false);}}>← Ко всему миру</button>}
         </div>
         <div className="map-frame">
           <MapContainer crs={L.CRS.Simple} bounds={imageBounds} minZoom={-1.5} maxZoom={2.5} zoomSnap={0.25} scrollWheelZoom={true} zoomControl={true} maxBounds={[[-100,-100],[H+100,W+100]]}>
@@ -156,7 +162,12 @@ function App() {
               eventHandlers={{
                 mouseover: e => e.target.setStyle({ fillOpacity: 0.30 }),
                 mouseout: e => e.target.setStyle(normalStyle),
-                click: () => setSelected(true)
+                click: () => setSelected(true),
+                dblclick: e => {
+                  L.DomEvent.stopPropagation(e);
+                  setSelected(true);
+                  setRegionView(true);
+                }
               }}
             >
               <Tooltip sticky direction="top" opacity={1}>Теократия Красной Розы · Нажмите, чтобы открыть</Tooltip>
@@ -164,14 +175,15 @@ function App() {
             {selected && <Marker position={capitalPosition} icon={cityIcon} eventHandlers={{click:()=>setShowCity(v=>!v)}}>
               <Tooltip permanent direction="top" offset={[0,-13]}>Ауренхельм · столица</Tooltip>
             </Marker>}
-            <ZoomToRegion active={selected} />
+            <ZoomToRegion active={selected} regionView={regionView} />
           </MapContainer>
-          <div className="map-hint">{selected ? "Колёсико мыши — масштаб · Перетаскивание — перемещение" : "Наведите на Теократию и нажмите, чтобы открыть государство"}</div>
+          <div className="map-hint">{regionView ? "Региональная карта · Колёсико мыши — приблизить · Нажмите Ауренхельм для сведений" : selected ? "Двойное нажатие на государство — открыть региональную карту" : "Наведите на Теократию и нажмите, чтобы открыть государство · Двойное нажатие — карта региона"}</div>
         </div>
       </section>
 
       <aside className="side-panel">
         {selected ? <>
+          {regionView && <div className="region-banner"><span className="eyebrow">ВТОРОЙ УРОВЕНЬ АТЛАСА</span><strong>Региональная карта Теократии</strong><p>Здесь будут отмечены города, поселения, дороги и важные места. Пока доступна столица Ауренхельм; остальные точки добавим по мере наполнения атласа.</p></div>}
           <div className="crest">☼</div>
           <div className="eyebrow">ГОСУДАРСТВО</div>
           <h2>Теократия Красной Розы</h2>
@@ -200,7 +212,7 @@ function App() {
           <div className="country-list">
             {["Медный Конклав","Империя Аквилон","Теократия Красной Розы","Вольные города","Архипелаг Серебряного Тумана","Легион Железного Порога","Орда Свободных Земель","Королевство Морт-Виль","Объединение Скьот"].map((name,i)=><button className={i===2?"country active":"country"} key={name} onClick={()=>i===2&&setSelected(true)}><span className="country-dot"></span>{name}<span className="country-arrow">›</span></button>)}
           </div>
-          <div className="notice">Пока интерактивно подключена Теократия Красной Розы. Остальные государства будут добавляться по мере подготовки их карт и описаний.</div>
+          <div className="notice">Пока интерактивно подключена Теократия Красной Розы. Одинарное нажатие открывает карточку страны, двойное — региональный уровень карты.</div>
         </>}
       </aside>
     </main>

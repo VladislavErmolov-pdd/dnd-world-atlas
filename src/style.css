@@ -26,3 +26,23 @@
 .leaflet-overlay-pane path.territory-hit-area:focus {
   outline: none !important;
 }
+
+.region-banner {
+  border: 1px solid rgba(224, 181, 105, .42);
+  background: rgba(224, 181, 105, .07);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+}
+.region-banner strong {
+  display: block;
+  color: #f0d39b;
+  margin-top: 5px;
+  font-family: Georgia, serif;
+}
+.region-banner p {
+  margin: 7px 0 0;
+  color: #c7bda8;
+  font-size: 12px;
+  line-height: 1.55;
+}

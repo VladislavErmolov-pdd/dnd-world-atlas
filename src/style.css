@@ -48,37 +48,13 @@
 }
 
 
-/* Маркеры подробной карты */
-.atlas-marker-wrap { background: transparent; border: 0; }
-.atlas-city-marker {
-  display:grid; place-items:center; width:28px; height:28px; border-radius:50%;
-  color:#ffe6ad; background:#39231f; border:2px solid #e6bd75;
-  box-shadow:0 0 10px #000b, 0 0 12px #d5a75b88; font-size:17px;
-}
-.atlas-fort-marker {
-  display:grid; place-items:center; width:25px; height:25px; border-radius:5px;
-  color:#f1e4c9; background:#30383a; border:2px solid #b7b4a8;
-  box-shadow:0 0 9px #000c; font-size:16px;
-}
-.atlas-village-marker {
-  display:grid; place-items:center; width:12px; height:12px; border-radius:50%;
-  color:#f5e4c5; background:#765d3b; border:1px solid #ead3a4;
-  box-shadow:none !important; filter:none !important; font-size:8px;
-}
-/* Поселения и часовни не подсвечиваются при наведении или фокусе. */
-.leaflet-marker-icon:focus,
-.leaflet-marker-icon:focus-visible {
-  outline:none !important;
-  filter:none !important;
-  box-shadow:none !important;
-}
-.atlas-village-marker:hover,
-.atlas-village-marker:focus,
-.atlas-village-marker:focus-visible {
-  outline:none !important;
-  filter:none !important;
-  box-shadow:none !important;
-}
+/* Невидимые области наведения располагаются поверх нарисованных на карте объектов. */
+.atlas-hotspot-wrap { background:transparent !important; border:0 !important; outline:none !important; }
+.atlas-hotspot { display:block; width:100%; height:100%; background:transparent; border:0; cursor:default; }
+.atlas-hotspot-wrap:focus,
+.atlas-hotspot:focus,
+.atlas-hotspot:focus-visible { outline:none !important; box-shadow:none !important; }
+
 .place-list { margin:14px 0; border-top:1px solid #51432f; }
 .place-row {
   width:100%; display:flex; align-items:center; gap:10px; padding:9px 5px;
@@ -89,3 +65,4 @@
 .place-symbol { color:#e8bd6d; }
 .back-button.wide { width:100%; margin-top:10px; }
 .leaflet-tooltip { white-space:nowrap; }
+

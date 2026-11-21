@@ -6,38 +6,58 @@ import "leaflet/dist/leaflet.css";
 import "./style.css";
 
 const W = 1448, H = 1086;
-const bounds = [[0, 0], [H, W]];
+const imageBounds = [[0, 0], [H, W]];
 
-// Контур оцифрован приблизительно по красной обводке на присланной карте.
-// При необходимости его можно будет уточнить, не меняя исходное изображение.
-const theocracy = [
-  [286, 647], [302, 619], [322, 607], [346, 576], [373, 560],
-  [397, 527], [418, 515], [435, 482], [431, 448], [415, 421],
-  [403, 382], [391, 352], [379, 321], [353, 302], [319, 289],
-  [285, 270], [283, 246], [301, 220], [329, 204], [354, 183],
-  [378, 151], [405, 126], [421, 101], [447, 91], [466, 97],
-  [488, 93], [510, 117], [537, 132], [558, 160], [585, 178],
-  [607, 199], [633, 217], [654, 246], [679, 260], [700, 284],
-  [722, 310], [741, 338], [752, 367], [739, 392], [716, 412],
-  [690, 424], [662, 433], [635, 425], [610, 425], [585, 437],
-  [559, 431], [534, 442], [510, 463], [486, 482], [462, 499],
-  [439, 516], [413, 536], [390, 558], [365, 573], [339, 568],
-  [319, 560], [299, 559], [286, 576], [278, 603], [286, 647]
+// Точки ниже заданы в пикселях исходной картинки: [x, y] от верхнего левого угла.
+// Leaflet CRS.Simple считает вертикальную координату снизу вверх,
+// поэтому переводим y в H - y. Это устраняет прежнее вертикальное смещение.
+const borderPixels = [
+  [647,287],[678,291],[710,287],[735,300],[757,321],[786,339],
+  [814,365],[845,378],[877,393],[912,410],[943,430],[943,448],
+  [923,468],[895,480],[871,493],[846,507],[818,513],[792,507],
+  [772,501],[751,505],[731,519],[708,535],[686,551],[669,568],
+  [648,593],[628,576],[607,560],[583,557],[557,558],[535,558],
+  [519,544],[519,520],[524,499],[542,485],[568,484],[588,480],
+  [590,461],[574,449],[551,436],[530,422],[512,407],[516,390],
+  [540,376],[563,360],[585,342],[604,318],[625,298],[647,287]
 ];
+const borderPositions = borderPixels.map(([x,y]) => [H-y, x]);
+
+// Примерная точка столицы по согласованному месту на мировой карте.
+// При необходимости можно будет сдвинуть её на несколько пикселей после проверки.
+const capitalPosition = [H-415, 704];
 
 function ZoomToRegion({ active }) {
   const map = useMap();
   React.useEffect(() => {
-    if (active) map.flyToBounds([[280, 280], [760, 760]], { duration: 1.3, padding: [35, 35] });
-    else map.flyToBounds(bounds, { duration: 1.1, padding: [10, 10] });
+    if (active) {
+      const regionBounds = [[H-625, 500], [H-280, 970]];
+      map.flyToBounds(regionBounds, { duration: 1.25, padding: [28, 28] });
+    } else {
+      map.flyToBounds(imageBounds, { duration: 1.1, padding: [8, 8] });
+    }
   }, [active, map]);
   return null;
 }
 
 function App() {
   const [selected, setSelected] = useState(false);
-  const [showInfo, setShowInfo] = useState(true);
-  const cityIcon = L.divIcon({ className: "city-marker-wrap", html: '<span class="city-marker">✦</span>', iconSize: [30,30], iconAnchor: [15,15] });
+  const [showCity, setShowCity] = useState(false);
+
+  const cityIcon = L.divIcon({
+    className: "city-marker-wrap",
+    html: '<span class="city-marker">✦</span>',
+    iconSize: [30,30],
+    iconAnchor: [15,15]
+  });
+
+  const normalStyle = {
+    color: "#f0c46d",
+    weight: 1.6,
+    opacity: 0.78,
+    fillColor: "#e4b65b",
+    fillOpacity: 0
+  };
 
   return <div className="app-shell">
     <header className="topbar">
@@ -49,22 +69,29 @@ function App() {
     <main className="layout">
       <section className="map-section">
         <div className="map-heading">
-          <div><div className="eyebrow">МИРОВАЯ КАРТА</div><h2>{selected ? "Теократия Красной Розы" : "Известные земли"}</h2></div>
-          {selected && <button className="back-button" onClick={() => setSelected(false)}>← Ко всему миру</button>}
+          <div><div className="eyebrow">{selected ? "ТЕРРИТОРИЯ ГОСУДАРСТВА" : "МИРОВАЯ КАРТА"}</div><h2>{selected ? "Теократия Красной Розы" : "Известные земли"}</h2></div>
+          {selected && <button className="back-button" onClick={() => {setSelected(false); setShowCity(false);}}>← Ко всему миру</button>}
         </div>
         <div className="map-frame">
-          <MapContainer crs={L.CRS.Simple} bounds={bounds} minZoom={-1.5} maxZoom={2.5} zoomSnap={0.25} scrollWheelZoom={true} zoomControl={true} maxBounds={[[-100,-100],[H+100,W+100]]}>
-            <ImageOverlay url="/maps/world-map.png" bounds={bounds} />
-            <Polygon positions={theocracy} pathOptions={{ color: "#f1c36a", weight: 3, opacity: 0.95, fillColor: "#e4b65b", fillOpacity: selected ? 0.19 : 0.04 }}
-              eventHandlers={{ mouseover: e => e.target.setStyle({ fillOpacity: 0.22, weight: 5 }), mouseout: e => e.target.setStyle({ fillOpacity: selected ? 0.19 : 0.04, weight: 3 }), click: () => setSelected(true) }}>
-              <Tooltip sticky>Теократия Красной Розы · Нажмите, чтобы приблизить</Tooltip>
+          <MapContainer crs={L.CRS.Simple} bounds={imageBounds} minZoom={-1.5} maxZoom={2.5} zoomSnap={0.25} scrollWheelZoom={true} zoomControl={true} maxBounds={[[-100,-100],[H+100,W+100]]}>
+            <ImageOverlay url="/maps/world-map.png" bounds={imageBounds} />
+            <Polygon
+              positions={borderPositions}
+              pathOptions={normalStyle}
+              eventHandlers={{
+                mouseover: e => e.target.setStyle({color:"#ffe09a",weight:3.5,opacity:1,fillColor:"#f0c46d",fillOpacity:0.13}),
+                mouseout: e => e.target.setStyle(normalStyle),
+                click: () => setSelected(true)
+              }}
+            >
+              <Tooltip sticky direction="top" opacity={1}>Теократия Красной Розы · Нажмите, чтобы открыть</Tooltip>
             </Polygon>
-            {selected && <Marker position={[420, 700]} icon={cityIcon} eventHandlers={{ click: () => setShowInfo(true) }}>
-              <Tooltip permanent direction="top" offset={[0,-12]}>Ауренхельм · столица</Tooltip>
+            {selected && <Marker position={capitalPosition} icon={cityIcon} eventHandlers={{click:()=>setShowCity(v=>!v)}}>
+              <Tooltip permanent direction="top" offset={[0,-13]}>Ауренхельм · столица</Tooltip>
             </Marker>}
             <ZoomToRegion active={selected} />
           </MapContainer>
-          <div className="map-hint">{selected ? "Колёсико мыши — масштаб · Перетаскивание — перемещение" : "Наведите на красную область и нажмите, чтобы открыть государство"}</div>
+          <div className="map-hint">{selected ? "Колёсико мыши — масштаб · Перетаскивание — перемещение" : "Наведите на Теократию и нажмите, чтобы открыть государство"}</div>
         </div>
       </section>
 
@@ -82,10 +109,10 @@ function App() {
             <div><small>Символ</small><strong>Солнце, выступающее из-за гор</strong></div>
             <div><small>Основные цвета</small><strong>Белый · золотой · алый · серебряный</strong></div>
           </div>
-          <button className="city-card" onClick={() => setShowInfo(!showInfo)}>
+          <button className="city-card" onClick={()=>setShowCity(v=>!v)}>
             <span className="city-symbol">✦</span><span><small>СТОЛИЦА</small><strong>Ауренхельм</strong><em>Открыть сведения о городе</em></span><b>→</b>
           </button>
-          {showInfo && <div className="city-note">Карточку Ауренхельма наполним отдельно, когда утвердим сведения о городе.</div>}
+          {showCity && <div className="city-note">Ауренхельм — столица Теократии Красной Розы. Подробное описание города добавим отдельно.</div>}
           <details open><summary>Вера и религия</summary><p>Жители Теократии поклоняются Единому Свету, который, согласно священным преданиям, создал мир и установил естественный порядок вещей. Его присутствие символизирует восходящее солнце.</p></details>
           <details><summary>Отношение к магии</summary><p>Теократия крайне отрицательно относится к магии, колдовству и магическим артефактам. За соблюдением запретов следит Инквизиция Красной Розы.</p></details>
           <details><summary>Общество и повседневная жизнь</summary><p>Страна сравнительно благополучна. В городах действуют храмы, больницы, приюты и школы. Общество строго иерархично.</p></details>
@@ -96,7 +123,7 @@ function App() {
           <h2>Изучайте известный мир</h2>
           <p>Выберите государство на карте, чтобы открыть его территорию и общедоступные сведения.</p>
           <div className="country-list">
-            {["Медный Конклав","Империя Аквилон","Теократия Красной Розы","Вольные города","Архипелаг Серебряного Тумана","Легион Железного Порога","Орда Свободных Земель","Королевство Морт-Виль","Объединение Скьот"].map((name,i)=><button className={i===2?"country active":"country"} key={name} onClick={() => i===2 && setSelected(true)}><span className="country-dot"></span>{name}<span className="country-arrow">›</span></button>)}
+            {["Медный Конклав","Империя Аквилон","Теократия Красной Розы","Вольные города","Архипелаг Серебряного Тумана","Легион Железного Порога","Орда Свободных Земель","Королевство Морт-Виль","Объединение Скьот"].map((name,i)=><button className={i===2?"country active":"country"} key={name} onClick={()=>i===2&&setSelected(true)}><span className="country-dot"></span>{name}<span className="country-arrow">›</span></button>)}
           </div>
           <div className="notice">Пока интерактивно подключена Теократия Красной Розы. Остальные государства будут добавляться по мере подготовки их карт и описаний.</div>
         </>}
@@ -105,5 +132,4 @@ function App() {
     <footer>АТЛАС ИЗВЕСТНОГО МИРА <span>·</span> Путеводитель для путешественников</footer>
   </div>;
 }
-
 createRoot(document.getElementById("root")).render(<App />);
